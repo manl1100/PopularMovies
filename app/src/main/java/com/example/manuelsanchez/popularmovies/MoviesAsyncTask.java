@@ -6,7 +6,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,9 +27,9 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
     private final Context mContext;
     private ArrayAdapter<String> mForecastAdapter;
 
-    public MoviesAsyncTask(Context context, ArrayAdapter<String> forecastAdapter) {
+    public MoviesAsyncTask(Context context) {
         mContext = context;
-        mForecastAdapter = forecastAdapter;
+//        mForecastAdapter = forecastAdapter;
     }
 
     @Override
@@ -39,15 +41,13 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
         BufferedReader reader = null;
 
         // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
+        String movieJsonString = null;
 
 
         try {
-            final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/";
-            final String MOVIE_PATH = "discover/movie";
+            final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=[API_KEY]";
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendPath(MOVIE_PATH)
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -78,7 +78,7 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
             if (buffer.length() == 0) {
                 return null;
             }
-            forecastJsonStr = buffer.toString();
+            movieJsonString = buffer.toString();
 
 
         } catch (IOException e) {
@@ -98,7 +98,7 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
         }
 
         try {
-            processJsonMovieData(forecastJsonStr);
+            processJsonMovieData(movieJsonString);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -106,7 +106,11 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    private void processJsonMovieData(String response) throws JSONException{
-
+    private void processJsonMovieData(String response) throws JSONException {
+        JSONObject jsonObject = new JSONObject(response);
+        JSONArray movies = jsonObject.getJSONArray("results");
+        for (int i = 0; i < movies.length(); i++) {
+            Log.e(LOG_TAG, movies.getJSONObject(i).getString("title"));
+        }
     }
 }
