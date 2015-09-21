@@ -25,11 +25,9 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
     private final String LOG_TAG = MoviesAsyncTask.class.getSimpleName();
 
     private final Context mContext;
-    private ArrayAdapter<String> mForecastAdapter;
 
     public MoviesAsyncTask(Context context) {
         mContext = context;
-//        mForecastAdapter = forecastAdapter;
     }
 
     @Override
