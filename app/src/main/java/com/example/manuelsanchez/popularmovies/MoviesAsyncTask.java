@@ -26,9 +26,11 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, List<Movie>> {
     private final String LOG_TAG = MoviesAsyncTask.class.getSimpleName();
 
     private final MoviesAdapter moviesAdapter;
+    private Context context;
 
-    public MoviesAsyncTask(MoviesAdapter moviesAdapter) {
+    public MoviesAsyncTask(MoviesAdapter moviesAdapter, Context context) {
         this.moviesAdapter = moviesAdapter;
+        this.context = context;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, List<Movie>> {
 
 
         try {
-            final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=[API_KEY]";
+            final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + context.getResources().getString(R.string.api_key);
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                     .build();

@@ -20,7 +20,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         moviesAdapter = new MoviesAdapter(getActivity(), R.layout.movie_item);
-        new MoviesAsyncTask(moviesAdapter).execute();
+        new MoviesAsyncTask(moviesAdapter, getActivity()).execute();
 
         GridView gridView = (GridView) view.findViewById(R.id.movieGrid);
         gridView.setAdapter(moviesAdapter);
