@@ -15,22 +15,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Manuel Sanchez on 9/16/15
  */
-public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
+public class MoviesAsyncTask extends AsyncTask<Void, Void, List<Movie>> {
 
     private final String LOG_TAG = MoviesAsyncTask.class.getSimpleName();
 
-    private final Context mContext;
+    private final MoviesAdapter moviesAdapter;
 
-    public MoviesAsyncTask(Context context) {
-        mContext = context;
+    public MoviesAsyncTask(MoviesAdapter moviesAdapter) {
+        this.moviesAdapter = moviesAdapter;
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected List<Movie> doInBackground(Void... params) {
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -95,7 +97,7 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
         }
 
         try {
-            processJsonMovieData(movieJsonString);
+            return processJsonMovieData(movieJsonString);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -103,11 +105,31 @@ public class MoviesAsyncTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    private void processJsonMovieData(String response) throws JSONException {
+    @Override
+    protected void onPostExecute(List<Movie> movies) {
+        if (movies != null) {
+            moviesAdapter.clear();
+            moviesAdapter.addAll(movies);
+            moviesAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private List<Movie> processJsonMovieData(String response) throws JSONException {
         JSONObject jsonObject = new JSONObject(response);
         JSONArray movies = jsonObject.getJSONArray("results");
+        String basePath = "http://image.tmdb.org/t/p/";
+        String size = "w185/";
+        ArrayList<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < movies.length(); i++) {
-            Log.e(LOG_TAG, movies.getJSONObject(i).getString("title"));
+            Movie movie = new Movie.Builder()
+                    .withMovieTitle(movies.getJSONObject(i).getString("title"))
+                    .withOverview(movies.getJSONObject(i).getString("overview"))
+                    .withPosterUrl(Uri.parse(basePath).buildUpon()
+                            .appendEncodedPath(size)
+                            .appendEncodedPath(movies.getJSONObject(i).getString("poster_path")).build().toString())
+                    .build();
+            movieList.add(movie);
         }
+        return movieList;
     }
 }

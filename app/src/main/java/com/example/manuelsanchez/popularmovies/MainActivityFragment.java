@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
+
+    private MoviesAdapter moviesAdapter;
 
     public MainActivityFragment() {
     }
@@ -18,7 +18,12 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        new MoviesAsyncTask(getActivity()).execute();
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        moviesAdapter = new MoviesAdapter(getActivity(), R.layout.movie_item);
+        new MoviesAsyncTask(moviesAdapter).execute();
+
+        GridView gridView = (GridView) view.findViewById(R.id.movieGrid);
+        gridView.setAdapter(moviesAdapter);
+        return view;
     }
 }
